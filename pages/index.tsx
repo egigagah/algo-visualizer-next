@@ -1,6 +1,5 @@
 import React from "react";
 import Head from "next/head";
-import ArrayWrapper from "@components/array/ArrayWrapper";
 import Link from "next/link";
 
 const Home: React.FC = () => {
