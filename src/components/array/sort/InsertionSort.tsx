@@ -1,21 +1,12 @@
-import React, { memo, useEffect, useState } from "react";
+import PlayerContext from "@components/player/PlayerContext";
+import React, { useContext, useEffect, useState } from "react";
 import { PromiseGenerator, swap } from "src/utils/algo/array";
 import useInterval from "src/utils/hooks/useInterval";
 
-interface InsertionSortType<T> {
-    array: T[];
-    delay: number | undefined;
-    isPlaying: boolean;
-    playingCallback: (value: boolean) => void;
-}
+export default function InsertionSortComponent(): JSX.Element {
+    const { state, dispatch } = useContext(PlayerContext);
 
-function InsertionSort({
-    array,
-    delay,
-    isPlaying,
-    playingCallback,
-}: InsertionSortType<number | string>) {
-    const [data, setData] = useState(array);
+    const [data, setData] = useState(state.data ?? []);
     const [length, setLength] = useState<number[]>([0, 1]);
     const [sublength, setSubLength] = useState<number[]>([0, 1]);
     const [pointer, setPointer] = useState<number>(1);
@@ -26,12 +17,15 @@ function InsertionSort({
         right: number,
     ): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            setTimeout(() => {
-                swap(arr, left, right);
-                setPointer(left);
-                setData(arr);
-                resolve(true);
-            }, delay);
+            setTimeout(
+                () => {
+                    swap(arr, left, right);
+                    setPointer(left);
+                    setData(arr);
+                    resolve(true);
+                },
+                state.delay ? state.delay / 2 : state.delay,
+            );
         });
     }
 
@@ -48,27 +42,32 @@ function InsertionSort({
                 } else {
                     left++;
                     right++;
-                    await PromiseGenerator(() => {
-                        setSubLength([left, right]);
-                        setLength([left, right]);
-                        setPointer(right);
-                    }, delay);
+                    await PromiseGenerator(
+                        () => {
+                            setSubLength([left, right]);
+                            setLength([left, right]);
+                            setPointer(right);
+                        },
+                        state.delay ? state.delay / 2 : state.delay,
+                    );
                 }
             } else {
-                playingCallback(false);
-                setLength([0, 1]);
-                setPointer(1);
+                dispatch({ type: "SET_PAUSE" });
+                // setLength([0, 1]);
+                // setPointer(1);
             }
         },
-        isPlaying ? delay : undefined,
+        state.isPlaying ? state.delay : undefined,
     );
 
     useEffect(() => {
-        setData(array);
-        setLength([0, 1]);
-        setSubLength([0, 1]);
-        setPointer(1);
-    }, [array]);
+        if (state.isReset) {
+            setData(state.data as (string | number)[]);
+            setLength([0, 1]);
+            setSubLength([0, 1]);
+            setPointer(1);
+        }
+    }, [state]);
 
     return (
         <div className="flex-1 h-full flex-col justify-center content-center mt-8">
@@ -83,12 +82,12 @@ function InsertionSort({
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
                                 idx === length[1]
-                                    ? "border-green-300"
+                                    ? "border-green-500"
                                     : "text-black border-gray-300"
                             }
                             ${
                                 idx <= length[0]
-                                    ? "border-blue-300"
+                                    ? "border-blue-500"
                                     : "text-black border-gray-300"
                             }
                             ${
@@ -105,13 +104,3 @@ function InsertionSort({
         </div>
     );
 }
-
-const InsertionSortComponent = memo(InsertionSort, (prev, next) => {
-    return (
-        prev.array === next.array &&
-        prev.isPlaying === next.isPlaying &&
-        prev.delay === next.delay
-    );
-});
-
-export default InsertionSortComponent;

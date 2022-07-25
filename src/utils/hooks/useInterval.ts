@@ -12,7 +12,6 @@ function useInterval(callback: () => void, delay?: number | undefined): void {
         if (!delay && delay !== 0) return;
 
         const interval = setInterval(() => callbackRef.current(), delay);
-        console.log(interval, "--");
         return () => clearInterval(interval);
     }, [delay]);
 }

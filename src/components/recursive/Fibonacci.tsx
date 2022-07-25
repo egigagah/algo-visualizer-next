@@ -1,15 +1,23 @@
-import PlayerContext from "@components/player/PlayerContext";
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { swap } from "src/utils/algo/array";
 import useInterval from "src/utils/hooks/useInterval";
 
-export default function BubbleSortComponent(): JSX.Element {
-    const { state, dispatch } = useContext(PlayerContext);
+interface FibonacciType<T> {
+    array: T[];
+    delay: number | undefined;
+    isPlaying: boolean;
+    playingCallback: (value: boolean) => void;
+}
 
-    const [data, setData] = useState(state.data ?? []);
+function Fibonacci({
+    array,
+    delay,
+    isPlaying,
+    playingCallback,
+}: FibonacciType<number | string>) {
+    const [data, setData] = useState(array);
     const [length, setLength] = useState<number>(1);
     const [isSwap, setSwap] = useState(false);
-    const [isDone, setDone] = useState(false);
 
     function promiseSwap(
         arr: (string | number)[],
@@ -20,8 +28,9 @@ export default function BubbleSortComponent(): JSX.Element {
                 setTimeout(() => {
                     swap(arr, length, length - 1);
                     setData(arr);
+                    console.warn(arr);
                     resolve(true);
-                }, state.delay);
+                }, delay);
             } catch (error) {
                 reject(false);
             }
@@ -30,39 +39,35 @@ export default function BubbleSortComponent(): JSX.Element {
 
     useInterval(
         async () => {
+            // setLength(length+1)
             setSwap(false);
-            let isSorted = true;
             const arr = [...data];
-            if (length < arr?.length && !isDone) {
+            let isSorted = true;
+            // setInterval(() => {
+            if (length < array.length) {
                 if (arr[length - 1] > arr[length]) {
                     setSwap(true);
                     await promiseSwap(arr, length);
+                    console.log("all done");
                 } else setLength(length + 1);
-            } else if (!isDone) {
+            } else {
                 let n = 1;
-                while (n < arr?.length) {
-                    if (arr[n - 1] > arr[n]) isSorted = false;
+                while (n < data.length) {
+                    if (data[n - 1] > data[n]) isSorted = false;
                     n++;
                 }
                 setLength(1);
-                if (isSorted) {
-                    setDone(true);
-                    setLength(-1);
-                    dispatch({ type: "SET_PAUSE" });
-                }
-            } else dispatch({ type: "SET_PAUSE" });
+                if (isSorted) playingCallback(false);
+            }
         },
-        state.isPlaying ? state.delay : undefined,
+        isPlaying ? delay : undefined,
     );
 
     useEffect(() => {
-        if (state.isReset) {
-            setData(state.data as (string | number)[]);
-            setLength(1);
-            setSwap(false);
-            setDone(false);
-        }
-    }, [state]);
+        setData(array);
+        setLength(1);
+        setSwap(false);
+    }, [array]);
 
     return (
         <div className="flex-1 h-full flex-col justify-center content-center mt-8">
@@ -70,22 +75,18 @@ export default function BubbleSortComponent(): JSX.Element {
                 <h2 className="text-2xl font-bold">Bubble Sort</h2>
             </div>
             <div className="flex flex-row justify-center items-center space-x-2 drop-shadow-2xl">
-                {data?.length > 0 &&
-                    data?.map((item, idx) => (
+                {data.length > 0 &&
+                    data.map((item, idx) => (
                         <div
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
                                 idx === length
                                     ? "bg-green-500 shadow-2xl border-none"
-                                    : idx <= length - 1 || isDone
-                                    ? "border-black"
-                                    : "bg-white border-gray-300"
+                                    : "bg-white border-black"
                             } ${
                                 idx === length - 1
                                     ? "bg-blue-500 border-none shadow-2xl"
-                                    : idx <= length - 1 || isDone
-                                    ? "border-black"
-                                    : "bg-white border-gray-300"
+                                    : "bg-white border-black"
                             }
                   ${
                       isSwap && (idx == length || idx == length - 1)
@@ -101,3 +102,13 @@ export default function BubbleSortComponent(): JSX.Element {
         </div>
     );
 }
+
+const FibonacciComponent = memo(Fibonacci, (prev, next) => {
+    return (
+        prev.array === next.array &&
+        prev.isPlaying === next.isPlaying &&
+        prev.delay === next.delay
+    );
+});
+
+export default FibonacciComponent;

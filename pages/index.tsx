@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Home: React.FC = () => {
     return (
-        <div className="flex-1 h-screen">
+        <div className="flex flex-col">
             <Head>
                 <title>Next.js</title>
                 <meta
@@ -25,6 +25,14 @@ const Home: React.FC = () => {
                             <Link href="array/sort/insertion">
                                 Insertion Sort
                             </Link>
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-col">
+                    <h2>Recursive</h2>
+                    <div className="flex flex-row space-x-4">
+                        <button className="shadow-lg px-4 py-2 border rounded-lg bg-green-200">
+                            <Link href="recursive/fibonacci">Fibonacci</Link>
                         </button>
                     </div>
                 </div>
