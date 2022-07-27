@@ -17,11 +17,16 @@ export default function BubbleSortComponent(): JSX.Element {
     ): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             try {
-                setTimeout(() => {
-                    swap(arr, length, length - 1);
-                    setData(arr);
-                    resolve(true);
-                }, state.delay);
+                setTimeout(
+                    () => {
+                        swap(arr, length, length - 1);
+                        setData(arr);
+                        resolve(true);
+                    },
+                    state.delay && state.delay > 0
+                        ? state.delay / 2
+                        : state.delay,
+                );
             } catch (error) {
                 reject(false);
             }
@@ -52,7 +57,11 @@ export default function BubbleSortComponent(): JSX.Element {
                 }
             } else dispatch({ type: "SET_PAUSE" });
         },
-        state.isPlaying ? state.delay : undefined,
+        state.isPlaying
+            ? state.delay && state.delay > 0
+                ? state.delay / 2
+                : state.delay
+            : undefined,
     );
 
     useEffect(() => {

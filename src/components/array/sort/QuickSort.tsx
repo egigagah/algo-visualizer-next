@@ -3,13 +3,23 @@ import React, { useContext, useEffect, useState } from "react";
 import { PromiseGenerator, swap } from "src/utils/algo/array";
 import useInterval from "src/utils/hooks/useInterval";
 
-export default function InsertionSortComponent(): JSX.Element {
+export default function QuickSortComponent(): JSX.Element {
     const { state, dispatch } = useContext(PlayerContext);
 
     const [data, setData] = useState(state.data ?? []);
-    const [length, setLength] = useState<number[]>([0, 1]);
-    const [sublength, setSubLength] = useState<number[]>([0, 1]);
-    const [pointer, setPointer] = useState<number>(1);
+    const [length, setLength] = useState<number[]>([
+        0,
+        data.length > 0 ? data.length - 1 : 0,
+    ]);
+    const [sublength, setSubLength] = useState<number[]>([
+        1,
+        data.length > 0 ? data.length - 1 : 0,
+    ]);
+    const [pointer, setPointer] = useState<number[]>([
+        1,
+        data.length > 0 ? data.length - 1 : 0,
+    ]);
+    const [pivot, setPivot] = useState(0);
 
     function promiseSwap(
         arr: (string | number)[],
@@ -20,7 +30,7 @@ export default function InsertionSortComponent(): JSX.Element {
             setTimeout(
                 () => {
                     swap(arr, left, right);
-                    setPointer(left);
+                    setPointer([left, right]);
                     setData(arr);
                     resolve(true);
                 },
@@ -33,23 +43,23 @@ export default function InsertionSortComponent(): JSX.Element {
         async () => {
             const arr = [...data];
 
-            let [left, right] = length;
-            if (right < arr.length) {
+            const [left, right] = length;
+            if (left < right) {
+                setPivot(left);
                 const [i, j] = sublength;
-                if (arr[i] > arr[j] && i >= 0) {
+                setPointer([i, j]);
+                console.log(left, right, "---masuk---", i, j);
+                if (arr[i] > arr[pivot] && arr[j] < arr[pivot] && i <= j) {
                     await promiseSwap(arr, i, j);
-                    setSubLength([i - 1, j - 1]);
-                } else {
-                    left++;
-                    right++;
-                    await PromiseGenerator(
-                        () => {
-                            setSubLength([left, right]);
-                            setLength([left, right]);
-                            setPointer(right);
-                        },
-                        state.delay ? state.delay / 2 : state.delay,
-                    );
+                    // setSubLength([i - 1, j - 1]);
+                } else if (arr[i] <= arr[pivot] && i <= j)
+                    setSubLength([i + 1, j]);
+                else if (arr[j] >= arr[pivot] && i <= j)
+                    setSubLength([i, j - 1]);
+                else if (i > j) {
+                    await promiseSwap(arr, pivot, j);
+                    setLength([left + 1, right]);
+                    setSubLength([left + 1, j - 1]);
                 }
             } else {
                 dispatch({ type: "SET_PAUSE" });
@@ -65,9 +75,13 @@ export default function InsertionSortComponent(): JSX.Element {
             setData(state.data as (string | number)[]);
             setLength([0, 1]);
             setSubLength([0, 1]);
-            setPointer(1);
         }
     }, [state]);
+
+    useEffect(() => {
+        setPointer([1, data?.length > 0 ? data?.length - 1 : 0]);
+        setPivot(0);
+    }, [data]);
 
     return (
         <div className="flex-1 h-full flex-col justify-center content-center space-y-8">
@@ -91,9 +105,14 @@ export default function InsertionSortComponent(): JSX.Element {
                                     : "text-black border-gray-300"
                             }
                             ${
-                                pointer === idx
+                                pointer.includes(idx)
                                     ? "bg-red-300 shadow-lg"
                                     : "bg-white"
+                            }
+                            ${
+                                pivot === idx
+                                    ? "underline font-bold"
+                                    : "no-underline font-normal"
                             }
                           `}
                         >

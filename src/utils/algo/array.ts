@@ -51,3 +51,39 @@ export function PromiseGenerator(
         }, delay);
     });
 }
+
+export function QuickSort<T>(
+    arr: Array<T>,
+    left = 0,
+    right = arr.length - 1,
+): Array<T> {
+    if (left >= right) return arr;
+    const rightIdx = PivotHelper(arr, left, right);
+
+    // array left < array right
+    // if (rightIdx - 1 - left < right - (rightIdx + 1)) {
+    // console.log(arr, rightIdx, left, right, "if");
+    QuickSort(arr, left, rightIdx - 1); // left array
+    QuickSort(arr, rightIdx + 1, right); // right array
+    // } else {
+    //     // else swipe array
+    //     console.log(arr, rightIdx, left, right, "else");
+    //     QuickSort(arr, rightIdx + 1, right); // right array
+    //     QuickSort(arr, left, rightIdx - 1); // left array
+    // }
+
+    return arr;
+}
+
+function PivotHelper<T>(arr: Array<T>, left: number, right: number): number {
+    const pivot = left++;
+    while (left <= right) {
+        if (arr[left] > arr[pivot] && arr[right] < arr[pivot]) {
+            swap(arr, left, right);
+        } else if (arr[left] <= arr[pivot]) left++;
+        else if (arr[right] >= arr[pivot]) right--;
+    }
+    swap(arr, pivot, right);
+
+    return right;
+}

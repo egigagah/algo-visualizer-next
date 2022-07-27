@@ -26,6 +26,9 @@ const Home: React.FC = () => {
                                 Insertion Sort
                             </Link>
                         </button>
+                        <button className="shadow-lg px-4 py-2 border rounded-lg bg-green-200">
+                            <Link href="array/sort/quick">Quick Sort</Link>
+                        </button>
                     </div>
                 </div>
                 <div className="flex flex-col">
