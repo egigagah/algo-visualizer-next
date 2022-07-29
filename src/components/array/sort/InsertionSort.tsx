@@ -82,12 +82,12 @@ export default function InsertionSortComponent(): JSX.Element {
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
                                 idx === length[1]
-                                    ? "border-green-600"
+                                    ? "border-green-400"
                                     : "text-black border-gray-300"
                             }
                             ${
                                 idx <= length[0]
-                                    ? "border-blue-500"
+                                    ? "border-blue-400"
                                     : "text-black border-gray-300"
                             }
                             ${

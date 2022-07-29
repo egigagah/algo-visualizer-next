@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { swap } from "src/utils/algo/array";
 import useInterval from "src/utils/hooks/useInterval";
 
-export default function BubbleSortComponent(): JSX.Element {
+export default function BubbleSortIntervalComponent(): JSX.Element {
     const { state, dispatch } = useContext(PlayerContext);
 
     const [data, setData] = useState(state.data ?? []);
@@ -85,7 +85,7 @@ export default function BubbleSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
                                 idx === pointer && idx !== pointer - 1
-                                    ? "border-green-600 shadow-2xl"
+                                    ? "border-green-500 shadow-2xl"
                                     : ""
                             } ${
                                 idx === pointer - 1 && idx !== pointer

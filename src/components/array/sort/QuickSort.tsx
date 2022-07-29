@@ -193,7 +193,7 @@ export default function QuickSortComponent(): JSX.Element {
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
                                 currPivot === idx && idx !== leftPointer
-                                    ? "border-red-500 underline font-bold"
+                                    ? "border-red-600 underline font-bold"
                                     : "no-underline font-normal"
                             }
                             ${
@@ -208,12 +208,12 @@ export default function QuickSortComponent(): JSX.Element {
                             }
                             ${
                                 idx === leftPointer && idx !== rightPointer
-                                    ? "border-blue-500"
+                                    ? "border-blue-600"
                                     : ""
                             }
                             ${
                                 idx === rightPointer && idx === leftPointer
-                                    ? "border-x-green-500 border-y-blue-500"
+                                    ? "border-x-green-600 border-y-blue-600"
                                     : "border-gray-300"
                             }
                           `}

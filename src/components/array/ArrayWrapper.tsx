@@ -1,7 +1,7 @@
 import PlayerComponent from "@components/player";
 import React from "react";
-import BubbleSortComponent from "./sort/BubbleSort";
-import TestSortComponent from "./sort/BuubleSortTest";
+import BubbleSortIntervalComponent from "./sort/BubbleSortInterval";
+import BubbleSortComponent from "./sort/BuubleSort";
 import InsertionSortComponent from "./sort/InsertionSort";
 import QuickSortComponent from "./sort/QuickSort";
 
@@ -21,7 +21,7 @@ export default function ArrayWrapper({ type }: ArrayWrapperType): JSX.Element {
             {type === "bubble" && <BubbleSortComponent />}
             {type === "insertion" && <InsertionSortComponent />}
             {type === "quick" && <QuickSortComponent />}
-            {type === "test" && <TestSortComponent />}
+            {type === "test" && <BubbleSortIntervalComponent />}
         </div>
     );
 }

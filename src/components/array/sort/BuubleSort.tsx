@@ -2,7 +2,7 @@ import PlayerContext from "@components/player/PlayerContext";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { swap } from "src/utils/algo/array";
 
-export default function TestSortComponent(): JSX.Element {
+export default function BubbleSortComponent(): JSX.Element {
     const { state, dispatch } = useContext(PlayerContext);
 
     const [data, setData] = useState<(string | number)[]>(
@@ -129,13 +129,13 @@ export default function TestSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
                                 idx === length
-                                    ? "border-green-600 shadow-2xl"
+                                    ? "border-green-700 shadow-2xl"
                                     : idx <= length - 1 || isDone
                                     ? "border-black"
                                     : "border-gray-300"
                             } ${
                                 idx === length - 1
-                                    ? "border-blue-500 shadow-2xl"
+                                    ? "border-blue-700 shadow-2xl"
                                     : idx <= length - 1 || isDone
                                     ? "border-black"
                                     : "border-gray-300"
