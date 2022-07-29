@@ -7,19 +7,19 @@ export default function BubbleSortComponent(): JSX.Element {
     const { state, dispatch } = useContext(PlayerContext);
 
     const [data, setData] = useState(state.data ?? []);
-    const [length, setLength] = useState<number>(1);
+    const [pointer, setPointer] = useState<number>(1);
     const [isSwap, setSwap] = useState(false);
     const [isDone, setDone] = useState(false);
 
     function promiseSwap(
         arr: (string | number)[],
-        length: number,
+        n: number,
     ): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             try {
                 setTimeout(
                     () => {
-                        swap(arr, length, length - 1);
+                        swap(arr, n, n - 1);
                         setData(arr);
                         resolve(true);
                     },
@@ -38,21 +38,21 @@ export default function BubbleSortComponent(): JSX.Element {
             setSwap(false);
             let isSorted = true;
             const arr = [...data];
-            if (length < arr?.length && !isDone) {
-                if (arr[length - 1] > arr[length]) {
+            if (pointer < arr?.length && !isDone) {
+                if (arr[pointer - 1] > arr[pointer]) {
                     setSwap(true);
-                    await promiseSwap(arr, length);
-                } else setLength(length + 1);
+                    await promiseSwap(arr, pointer);
+                } else setPointer(pointer + 1);
             } else if (!isDone) {
                 let n = 1;
                 while (n < arr?.length) {
                     if (arr[n - 1] > arr[n]) isSorted = false;
                     n++;
                 }
-                setLength(1);
+                setPointer(1);
                 if (isSorted) {
                     setDone(true);
-                    setLength(-1);
+                    setPointer(-1);
                     dispatch({ type: "SET_PAUSE" });
                 }
             } else dispatch({ type: "SET_PAUSE" });
@@ -67,7 +67,7 @@ export default function BubbleSortComponent(): JSX.Element {
     useEffect(() => {
         if (state.isReset) {
             setData(state.data as (string | number)[]);
-            setLength(1);
+            setPointer(1);
             setSwap(false);
             setDone(false);
         }
@@ -84,22 +84,24 @@ export default function BubbleSortComponent(): JSX.Element {
                         <div
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
-                                idx === length
-                                    ? "bg-green-500 shadow-2xl border-none"
-                                    : idx <= length - 1 || isDone
-                                    ? "border-black"
-                                    : "bg-white border-gray-300"
+                                idx === pointer && idx !== pointer - 1
+                                    ? "border-green-600 shadow-2xl"
+                                    : ""
                             } ${
-                                idx === length - 1
-                                    ? "bg-blue-500 border-none shadow-2xl"
-                                    : idx <= length - 1 || isDone
+                                idx === pointer - 1 && idx !== pointer
+                                    ? "border-blue-500 shadow-2xl"
+                                    : ""
+                            }
+                            ${
+                                (idx <= pointer - 1 && idx !== pointer) ||
+                                isDone
                                     ? "border-black"
-                                    : "bg-white border-gray-300"
+                                    : "border-gray-300"
                             }
                   ${
-                      isSwap && (idx == length || idx == length - 1)
-                          ? "font-black text-white"
-                          : "font-normal"
+                      isSwap && (idx == pointer || idx == pointer - 1)
+                          ? "font-black underline"
+                          : "font-normal no-underline"
                   }
                 `}
                         >

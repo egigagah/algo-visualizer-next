@@ -82,7 +82,7 @@ export default function InsertionSortComponent(): JSX.Element {
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
                                 idx === length[1]
-                                    ? "border-green-500"
+                                    ? "border-green-600"
                                     : "text-black border-gray-300"
                             }
                             ${
@@ -92,8 +92,8 @@ export default function InsertionSortComponent(): JSX.Element {
                             }
                             ${
                                 pointer === idx
-                                    ? "bg-red-300 shadow-lg"
-                                    : "bg-white"
+                                    ? "font-bold underline shadow-lg"
+                                    : "no-underline"
                             }
                           `}
                         >

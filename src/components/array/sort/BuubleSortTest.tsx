@@ -129,20 +129,20 @@ export default function TestSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
                                 idx === length
-                                    ? "bg-green-500 shadow-2xl border-none"
+                                    ? "border-green-600 shadow-2xl"
                                     : idx <= length - 1 || isDone
                                     ? "border-black"
-                                    : "bg-white border-gray-300"
+                                    : "border-gray-300"
                             } ${
                                 idx === length - 1
-                                    ? "bg-blue-500 border-none shadow-2xl"
+                                    ? "border-blue-500 shadow-2xl"
                                     : idx <= length - 1 || isDone
                                     ? "border-black"
-                                    : "bg-white border-gray-300"
+                                    : "border-gray-300"
                             }
                   ${
                       isSwap && (idx == length || idx == length - 1)
-                          ? "font-black text-white"
+                          ? "font-black underline"
                           : "font-normal"
                   }
                 `}

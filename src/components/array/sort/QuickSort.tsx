@@ -203,7 +203,7 @@ export default function QuickSortComponent(): JSX.Element {
                             }
                             ${
                                 idx === rightPointer && idx !== leftPointer
-                                    ? "border-green-500"
+                                    ? "border-green-600"
                                     : ""
                             }
                             ${
