@@ -1,92 +1,189 @@
 import PlayerContext from "@components/player/PlayerContext";
-import React, { useContext, useEffect, useState } from "react";
-import { PromiseGenerator, swap } from "src/utils/algo/array";
-import useInterval from "src/utils/hooks/useInterval";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { promiseSwap, waiting } from "src/utils/helper";
 
 export default function QuickSortComponent(): JSX.Element {
     const { state, dispatch } = useContext(PlayerContext);
 
-    const [data, setData] = useState(state.data ?? []);
-    const [length, setLength] = useState<number[]>([
-        0,
+    const [data, setData] = useState(state.data ? [...state.data] : []);
+    const [isDone, setDone] = useState(false);
+    const [leftPointer, setLeftPointer] = useState<number>(0);
+    const [rightPointer, setRightPointer] = useState<number>(
         data.length > 0 ? data.length - 1 : 0,
-    ]);
-    const [sublength, setSubLength] = useState<number[]>([
-        1,
-        data.length > 0 ? data.length - 1 : 0,
-    ]);
-    const [pointer, setPointer] = useState<number[]>([
-        1,
-        data.length > 0 ? data.length - 1 : 0,
-    ]);
-    const [pivot, setPivot] = useState(0);
+    );
+    const [currPivot, setPivot] = useState(0);
+    const currArrayLength = useRef([0, data.length > 0 ? data.length - 1 : 0]);
+    const stackArray = useRef([[0, data.length > 0 ? data.length - 1 : 0]]);
+    // const pausePosition = useRef<number | null>(null);
+    const generatorStatus = useRef<Promise<IteratorResult<boolean, void>>>();
+    const playingStatus = useRef<boolean>(state.isPlaying ?? false);
 
-    function promiseSwap(
+    async function init() {
+        try {
+            const it = sorting([...data]);
+            if (!(await generatorStatus.current))
+                generatorStatus.current = it.next();
+            while (
+                generatorStatus.current &&
+                !(await generatorStatus.current).value &&
+                !(await generatorStatus.current).done &&
+                playingStatus.current &&
+                !isDone
+            ) {
+                generatorStatus.current = it.next();
+                await waiting(state.delay, 1, playingStatus.current);
+            }
+            dispatch({ type: "SET_PAUSE" });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function* sorting(arr: (string | number)[]) {
+        do {
+            if (currArrayLength.current[1] - currArrayLength.current[0] > 1) {
+                const [left, right] = stackArray.current[0];
+                const rightIdx = await pivotHelper(arr, left, right);
+
+                // left array
+                currArrayLength.current[0] = left;
+                currArrayLength.current[1] = rightIdx - 1;
+                const tmp = [];
+                if (currArrayLength.current[0] < currArrayLength.current[1]) {
+                    tmp.push([
+                        currArrayLength.current[0],
+                        currArrayLength.current[1],
+                    ]);
+                }
+
+                // right array
+                currArrayLength.current[0] = rightIdx + 1;
+                currArrayLength.current[1] = rightPointer;
+                if (currArrayLength.current[0] < currArrayLength.current[1]) {
+                    tmp.push([
+                        currArrayLength.current[0],
+                        currArrayLength.current[1],
+                    ]);
+                }
+
+                stackArray.current.push(...tmp);
+            }
+
+            stackArray.current.shift();
+            if (stackArray.current.length > 0) {
+                const [left, right] = stackArray.current[0];
+                currArrayLength.current = [left, right];
+                yield false;
+            } else yield true;
+        } while (stackArray.current.length > 0);
+        setDone(true);
+        yield true;
+    }
+
+    async function pivotHelper(
         arr: (string | number)[],
         left: number,
         right: number,
-    ): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            setTimeout(
-                () => {
-                    swap(arr, left, right);
-                    setPointer([left, right]);
-                    setData(arr);
-                    resolve(true);
+    ): Promise<number> {
+        const pivot = left++;
+        setPivot(pivot);
+        while (left <= right) {
+            setLeftPointer(left);
+            setRightPointer(right);
+            await waiting(state.delay, 2, playingStatus.current);
+            if (arr[left] > arr[pivot] && arr[right] < arr[pivot]) {
+                await promiseSwap(
+                    arr,
+                    left,
+                    right,
+                    playingStatus.current,
+                    (d) => {
+                        setData([...d]);
+                    },
+                    state.delay,
+                    2,
+                );
+            } else if (arr[left] <= arr[pivot]) left++;
+            else if (arr[right] >= arr[pivot]) right--;
+            await waiting(state.delay, 2, playingStatus.current);
+        }
+        if (pivot !== right) {
+            setRightPointer(right);
+            await waiting(state.delay, 2, playingStatus.current);
+            await promiseSwap(
+                arr,
+                pivot,
+                right,
+                playingStatus.current,
+                (d) => {
+                    setData([...d]);
                 },
-                state.delay ? state.delay / 2 : state.delay,
+                state.delay,
+                1,
             );
-        });
+            await waiting(state.delay, 2, playingStatus.current);
+        }
+
+        return right;
     }
 
-    useInterval(
-        async () => {
-            const arr = [...data];
-
-            const [left, right] = length;
-            if (left < right) {
-                setPivot(left);
-                const [i, j] = sublength;
-                setPointer([i, j]);
-                console.log(left, right, "---masuk---", i, j);
-                if (arr[i] > arr[pivot] && arr[j] < arr[pivot] && i <= j) {
-                    await promiseSwap(arr, i, j);
-                    // setSubLength([i - 1, j - 1]);
-                } else if (arr[i] <= arr[pivot] && i <= j)
-                    setSubLength([i + 1, j]);
-                else if (arr[j] >= arr[pivot] && i <= j)
-                    setSubLength([i, j - 1]);
-                else if (i > j) {
-                    await promiseSwap(arr, pivot, j);
-                    setLength([left + 1, right]);
-                    setSubLength([left + 1, j - 1]);
-                }
-            } else {
-                dispatch({ type: "SET_PAUSE" });
-                // setLength([0, 1]);
-                // setPointer(1);
-            }
-        },
-        state.isPlaying ? state.delay : undefined,
-    );
+    useEffect(() => {
+        playingStatus.current = state.isPlaying ?? false;
+        if (state.isPlaying) {
+            init();
+        }
+    }, [state.isPlaying]);
 
     useEffect(() => {
         if (state.isReset) {
-            setData(state.data as (string | number)[]);
-            setLength([0, 1]);
-            setSubLength([0, 1]);
+            setData(state.data ? [...state.data] : []);
+            setLeftPointer(0);
+            setRightPointer((state.data && state.data.length - 1) ?? 0);
+            setPivot(0);
+            generatorStatus.current = undefined;
+            setDone(false);
+            stackArray.current = [
+                [
+                    0,
+                    state.data && state.data.length > 0
+                        ? state.data.length - 1
+                        : 0,
+                ],
+            ];
+            currArrayLength.current = [
+                0,
+                state.data && state.data.length > 0 ? state.data.length - 1 : 0,
+            ];
         }
-    }, [state]);
+    }, [state.isReset]);
 
     useEffect(() => {
-        setPointer([1, data?.length > 0 ? data?.length - 1 : 0]);
-        setPivot(0);
-    }, [data]);
+        if (state.data) {
+            setData(state.data ? [...state.data] : []);
+            setLeftPointer(0);
+            setRightPointer((state.data && state.data.length - 1) ?? 0);
+            setPivot(0);
+            generatorStatus.current = undefined;
+            setDone(false);
+            stackArray.current = [
+                [
+                    0,
+                    state.data && state.data.length > 0
+                        ? state.data.length - 1
+                        : 0,
+                ],
+            ];
+            currArrayLength.current = [
+                0,
+                state.data && state.data.length > 0 ? state.data.length - 1 : 0,
+            ];
+        }
+    }, [state.data]);
 
     return (
         <div className="flex-1 h-full flex-col justify-center content-center space-y-8">
             <div className="flex justify-center">
-                <h2 className="text-2xl font-bold">Insertion Sort</h2>
+                <h2 className="text-2xl font-bold">Quick Sort</h2>
             </div>
             <div className="flex flex-row justify-center items-center space-x-2">
                 {data.length > 0 &&
@@ -95,24 +192,29 @@ export default function QuickSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
-                                idx === length[1]
-                                    ? "border-green-500"
-                                    : "text-black border-gray-300"
-                            }
-                            ${
-                                idx <= length[0]
-                                    ? "border-blue-500"
-                                    : "text-black border-gray-300"
-                            }
-                            ${
-                                pointer.includes(idx)
-                                    ? "bg-red-300 shadow-lg"
-                                    : "bg-white"
-                            }
-                            ${
-                                pivot === idx
-                                    ? "underline font-bold"
+                                currPivot === idx && idx !== leftPointer
+                                    ? "border-red-500 underline font-bold"
                                     : "no-underline font-normal"
+                            }
+                            ${
+                                idx > leftPointer && idx < rightPointer
+                                    ? "border-black"
+                                    : "border-gray-300"
+                            }
+                            ${
+                                idx === rightPointer && idx !== leftPointer
+                                    ? "border-green-500"
+                                    : ""
+                            }
+                            ${
+                                idx === leftPointer && idx !== rightPointer
+                                    ? "border-blue-500"
+                                    : ""
+                            }
+                            ${
+                                idx === rightPointer && idx === leftPointer
+                                    ? "border-x-green-500 border-y-blue-500"
+                                    : "border-gray-300"
                             }
                           `}
                         >

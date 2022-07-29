@@ -60,17 +60,8 @@ export function QuickSort<T>(
     if (left >= right) return arr;
     const rightIdx = PivotHelper(arr, left, right);
 
-    // array left < array right
-    // if (rightIdx - 1 - left < right - (rightIdx + 1)) {
-    // console.log(arr, rightIdx, left, right, "if");
     QuickSort(arr, left, rightIdx - 1); // left array
     QuickSort(arr, rightIdx + 1, right); // right array
-    // } else {
-    //     // else swipe array
-    //     console.log(arr, rightIdx, left, right, "else");
-    //     QuickSort(arr, rightIdx + 1, right); // right array
-    //     QuickSort(arr, left, rightIdx - 1); // left array
-    // }
 
     return arr;
 }
