@@ -20,14 +20,14 @@ const ArrayTypeSort: React.FC = () => {
             </Head>
 
             <div className="flex flex-col space-y-4">
-                <div className="flex">
+                {/* <div className="flex">
                     <button onClick={() => router.back()}>
                         <div className="flex flex-row justify-center content-center shadow-md border rounded-md px-4 py-2">
                             <IoArrowBack className="self-center mr-2" />
                             Back
                         </div>
                     </button>
-                </div>
+                </div> */}
                 <ArrayWrapper type={type} />
             </div>
             <div className="flex flex-col w-1/3 shadow-md px-4 py-2 space-y-4 text-sm">
