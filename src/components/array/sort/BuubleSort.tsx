@@ -129,15 +129,15 @@ export default function BubbleSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
                                 idx === length
-                                    ? "border-green-700 shadow-2xl"
+                                    ? "!border-green-700 shadow-2xl"
                                     : idx <= length - 1 || isDone
-                                    ? "border-black"
+                                    ? "!border-black"
                                     : "border-gray-300"
                             } ${
                                 idx === length - 1
-                                    ? "border-blue-700 shadow-2xl"
+                                    ? "!border-blue-700 shadow-2xl"
                                     : idx <= length - 1 || isDone
-                                    ? "border-black"
+                                    ? "!border-black"
                                     : "border-gray-300"
                             }
                   ${

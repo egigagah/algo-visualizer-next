@@ -28,7 +28,7 @@ export function promiseSwap(
     return new Promise<boolean>((resolve, reject) => {
         try {
             setTimeout(
-                async () => {
+                () => {
                     if (!isPlaying) return;
                     swap(arr, i, j);
                     action(arr);

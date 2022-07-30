@@ -12,11 +12,14 @@ export default function QuickSortComponent(): JSX.Element {
         data.length > 0 ? data.length - 1 : 0,
     );
     const [currPivot, setPivot] = useState(0);
-    const currArrayLength = useRef([0, data.length > 0 ? data.length - 1 : 0]);
+
+    // ref for helper data;
+    const currArray = useRef([0, data.length > 0 ? data.length - 1 : 0]);
     const stackArray = useRef([[0, data.length > 0 ? data.length - 1 : 0]]);
-    // const pausePosition = useRef<number | null>(null);
     const generatorStatus = useRef<Promise<IteratorResult<boolean, void>>>();
     const playingStatus = useRef<boolean>(state.isPlaying ?? false);
+    const pausePosition = useRef<number[] | undefined>();
+    const lengthArray = useRef<number | undefined>();
 
     async function init() {
         try {
@@ -34,6 +37,7 @@ export default function QuickSortComponent(): JSX.Element {
                 await waiting(state.delay, 1, playingStatus.current);
             }
             dispatch({ type: "SET_PAUSE" });
+            setDone(true);
         } catch (error) {
             console.error(error);
         }
@@ -41,38 +45,33 @@ export default function QuickSortComponent(): JSX.Element {
 
     async function* sorting(arr: (string | number)[]) {
         do {
-            if (currArrayLength.current[1] - currArrayLength.current[0] > 1) {
+            if (currArray.current[0] < currArray.current[1]) {
                 const [left, right] = stackArray.current[0];
+                lengthArray.current = right;
                 const rightIdx = await pivotHelper(arr, left, right);
 
                 // left array
-                currArrayLength.current[0] = left;
-                currArrayLength.current[1] = rightIdx - 1;
+                currArray.current[0] = left;
+                currArray.current[1] = rightIdx - 1;
                 const tmp = [];
-                if (currArrayLength.current[0] < currArrayLength.current[1]) {
-                    tmp.push([
-                        currArrayLength.current[0],
-                        currArrayLength.current[1],
-                    ]);
+                if (currArray.current[0] < currArray.current[1]) {
+                    tmp.push([currArray.current[0], currArray.current[1]]);
                 }
 
                 // right array
-                currArrayLength.current[0] = rightIdx + 1;
-                currArrayLength.current[1] = rightPointer;
-                if (currArrayLength.current[0] < currArrayLength.current[1]) {
-                    tmp.push([
-                        currArrayLength.current[0],
-                        currArrayLength.current[1],
-                    ]);
+                currArray.current[0] = rightIdx + 1;
+                currArray.current[1] = lengthArray.current;
+                if (currArray.current[0] < currArray.current[1]) {
+                    tmp.push([currArray.current[0], currArray.current[1]]);
                 }
 
                 stackArray.current.push(...tmp);
             }
 
-            stackArray.current.shift();
+            if (playingStatus.current) stackArray.current.shift();
             if (stackArray.current.length > 0) {
                 const [left, right] = stackArray.current[0];
-                currArrayLength.current = [left, right];
+                currArray.current = [left, right];
                 yield false;
             } else yield true;
         } while (stackArray.current.length > 0);
@@ -82,10 +81,11 @@ export default function QuickSortComponent(): JSX.Element {
 
     async function pivotHelper(
         arr: (string | number)[],
-        left: number,
-        right: number,
+        leftProps: number,
+        rightProps: number,
     ): Promise<number> {
-        const pivot = left++;
+        let { left, right } = extractPausePosition(leftProps, rightProps);
+        const pivot = leftProps++;
         setPivot(pivot);
         while (left <= right) {
             setLeftPointer(left);
@@ -101,15 +101,13 @@ export default function QuickSortComponent(): JSX.Element {
                         setData([...d]);
                     },
                     state.delay,
-                    2,
+                    3,
                 );
             } else if (arr[left] <= arr[pivot]) left++;
             else if (arr[right] >= arr[pivot]) right--;
-            await waiting(state.delay, 2, playingStatus.current);
         }
         if (pivot !== right) {
             setRightPointer(right);
-            await waiting(state.delay, 2, playingStatus.current);
             await promiseSwap(
                 arr,
                 pivot,
@@ -119,7 +117,7 @@ export default function QuickSortComponent(): JSX.Element {
                     setData([...d]);
                 },
                 state.delay,
-                1,
+                5,
             );
             await waiting(state.delay, 2, playingStatus.current);
         }
@@ -131,6 +129,9 @@ export default function QuickSortComponent(): JSX.Element {
         playingStatus.current = state.isPlaying ?? false;
         if (state.isPlaying) {
             init();
+        } else {
+            pausePosition.current = [leftPointer, rightPointer];
+            generatorStatus.current = undefined;
         }
     }, [state.isPlaying]);
 
@@ -139,9 +140,11 @@ export default function QuickSortComponent(): JSX.Element {
             setData(state.data ? [...state.data] : []);
             setLeftPointer(0);
             setRightPointer((state.data && state.data.length - 1) ?? 0);
+            lengthArray.current = (state.data && state.data.length - 1) ?? 0;
             setPivot(0);
             generatorStatus.current = undefined;
             setDone(false);
+            pausePosition.current = undefined;
             stackArray.current = [
                 [
                     0,
@@ -150,7 +153,7 @@ export default function QuickSortComponent(): JSX.Element {
                         : 0,
                 ],
             ];
-            currArrayLength.current = [
+            currArray.current = [
                 0,
                 state.data && state.data.length > 0 ? state.data.length - 1 : 0,
             ];
@@ -162,6 +165,7 @@ export default function QuickSortComponent(): JSX.Element {
             setData(state.data ? [...state.data] : []);
             setLeftPointer(0);
             setRightPointer((state.data && state.data.length - 1) ?? 0);
+            lengthArray.current = (state.data && state.data.length - 1) ?? 0;
             setPivot(0);
             generatorStatus.current = undefined;
             setDone(false);
@@ -173,12 +177,22 @@ export default function QuickSortComponent(): JSX.Element {
                         : 0,
                 ],
             ];
-            currArrayLength.current = [
+            currArray.current = [
                 0,
                 state.data && state.data.length > 0 ? state.data.length - 1 : 0,
             ];
         }
     }, [state.data]);
+
+    const extractPausePosition = (leftProps: number, rightProps: number) => {
+        let left = leftProps,
+            right = rightProps;
+        if (pausePosition.current && playingStatus.current) {
+            [left, right] = pausePosition.current;
+            pausePosition.current = undefined;
+        }
+        return { left, right };
+    };
 
     return (
         <div className="flex-1 h-full flex-col justify-center content-center space-y-8">
@@ -192,30 +206,41 @@ export default function QuickSortComponent(): JSX.Element {
                             key={idx}
                             className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
                             ${
-                                currPivot === idx && idx !== leftPointer
-                                    ? "border-red-600 underline font-bold"
+                                currPivot === idx &&
+                                idx !== leftPointer &&
+                                !isDone
+                                    ? "!border-red-500 underline font-black"
                                     : "no-underline font-normal"
                             }
                             ${
-                                idx > leftPointer && idx < rightPointer
-                                    ? "border-black"
-                                    : "border-gray-300"
-                            }
-                            ${
-                                idx === rightPointer && idx !== leftPointer
-                                    ? "border-green-600"
+                                idx === rightPointer &&
+                                idx !== leftPointer &&
+                                !isDone
+                                    ? "!border-green-700"
                                     : ""
                             }
                             ${
-                                idx === leftPointer && idx !== rightPointer
-                                    ? "border-blue-600"
+                                idx === leftPointer &&
+                                idx !== rightPointer &&
+                                !isDone
+                                    ? "!border-blue-700"
                                     : ""
                             }
                             ${
-                                idx === rightPointer && idx === leftPointer
-                                    ? "border-x-green-600 border-y-blue-600"
+                                idx === rightPointer &&
+                                idx === leftPointer &&
+                                !isDone
+                                    ? "!border-x-green-500 !border-y-blue-500"
                                     : "border-gray-300"
                             }
+                            ${
+                                idx > leftPointer &&
+                                idx < rightPointer &&
+                                !isDone
+                                    ? "!border-black"
+                                    : "border-gray-300"
+                            }
+                            ${isDone ? "!border-black" : ""}
                           `}
                         >
                             {item}
@@ -229,9 +254,9 @@ export default function QuickSortComponent(): JSX.Element {
                 <div className="flex flex-row w-full lg:w-1/2 xl:w-1/3 justify-center">
                     <div className="flex-1 flex-col">
                         <p className="font-bold">Time</p>
-                        <p>Best: O(n)</p>
-                        <p>Worst: O(n^2)</p>
-                        <p>Average: O(n^2)</p>
+                        <p>Best: O(n(log n))</p>
+                        <p>Worst: O(n(log n))</p>
+                        <p>Average: O(n(log n))</p>
                     </div>
                     <div className="flex-1 flex-col">
                         <p className="font-bold">Space</p>

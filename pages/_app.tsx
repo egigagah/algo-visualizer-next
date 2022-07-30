@@ -1,6 +1,6 @@
 import React from "react";
 import { AppProps } from "next/app";
-import "tailwindcss/tailwind.css";
+// import "tailwindcss/tailwind.css";
 import "@styles/global.css";
 import { PlayerProvider } from "@components/player/PlayerContext";
 
