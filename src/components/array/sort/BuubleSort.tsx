@@ -132,22 +132,22 @@ export default function BubbleSortComponent(): JSX.Element {
                                     ((item as number) * 100) / 40 + 70
                                 }px`,
                             }}
-                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4 ${
+                            className={`flex w-20 pb-2 justify-center items-end text-4xl text-gray-300 border-4 ${
                                 idx === length
-                                    ? "!border-green-700 shadow-xl"
+                                    ? "!border-green-700 shadow-xl !text-black"
                                     : idx <= length - 1 || isDone
-                                    ? "!border-black"
+                                    ? "!border-black !text-black"
                                     : "border-gray-300"
                             } ${
                                 idx === length - 1
-                                    ? "!border-blue-700 shadow-xl"
+                                    ? "!border-blue-700 shadow-xl !text-black"
                                     : idx <= length - 1 || isDone
-                                    ? "!border-black"
+                                    ? "!border-black !text-black"
                                     : "border-gray-300"
                             }
                   ${
                       isSwap && (idx == length || idx == length - 1)
-                          ? "font-black underline"
+                          ? "font-bold underline !text-black"
                           : "font-normal"
                   }
                 `}

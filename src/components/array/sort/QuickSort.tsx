@@ -214,38 +214,38 @@ export default function QuickSortComponent(): JSX.Element {
                                 currPivot === idx &&
                                 idx !== leftPointer &&
                                 !isDone
-                                    ? "!border-red-500 underline font-bold"
+                                    ? "!border-red-500 underline font-bold !text-black"
                                     : "no-underline font-normal"
                             }
                             ${
                                 idx === rightPointer &&
                                 idx !== leftPointer &&
                                 !isDone
-                                    ? "!border-green-700 shadow-xl"
+                                    ? "!border-green-700 shadow-xl !text-black"
                                     : ""
                             }
                             ${
                                 idx === leftPointer &&
                                 idx !== rightPointer &&
                                 !isDone
-                                    ? "!border-blue-700 shadow-xl"
+                                    ? "!border-blue-700 shadow-xl !text-black"
                                     : ""
                             }
                             ${
                                 idx === rightPointer &&
                                 idx === leftPointer &&
                                 !isDone
-                                    ? "!border-x-green-500 !border-y-blue-500 shadow-xl"
+                                    ? "!border-x-green-500 !border-y-blue-500 shadow-xl !text-black"
                                     : "border-gray-300"
                             }
                             ${
                                 idx > leftPointer &&
                                 idx < rightPointer &&
                                 !isDone
-                                    ? "!border-black"
+                                    ? "!border-black !text-black"
                                     : "border-gray-300"
                             }
-                            ${isDone ? "!border-black" : ""}
+                            ${isDone ? "!border-black" : "text-gray-300"}
                           `}
                         >
                             {item}

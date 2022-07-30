@@ -84,20 +84,20 @@ export default function InsertionSortComponent(): JSX.Element {
                                     ((item as number) * 100) / 40 + 70
                                 }px`,
                             }}
-                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4
+                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4 text-gray-300
                             ${
                                 idx === length[1]
-                                    ? "!border-green-700"
+                                    ? "!border-green-700 !text-black"
                                     : "text-black border-gray-300"
                             }
                             ${
                                 idx <= length[0]
-                                    ? "!border-blue-700"
+                                    ? "!border-blue-700 !text-black"
                                     : "text-black border-gray-300"
                             }
                             ${
                                 pointer === idx
-                                    ? "font-black underline shadow-xl"
+                                    ? "font-black underline shadow-xl !text-black"
                                     : "no-underline"
                             }
                           `}
