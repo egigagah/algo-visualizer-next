@@ -79,7 +79,7 @@ function Fibonacci({
                     data.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
+                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-4 ${
                                 idx === length
                                     ? "bg-green-500 shadow-2xl border-none"
                                     : "bg-white border-black"

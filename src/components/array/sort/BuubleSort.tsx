@@ -122,20 +122,25 @@ export default function BubbleSortComponent(): JSX.Element {
             <div className="flex justify-center">
                 <h2 className="text-2xl font-bold">Bubble Sort</h2>
             </div>
-            <div className="flex flex-row justify-center items-center space-x-2 drop-shadow-2xl">
+            <div className="flex flex-row justify-center items-end space-x-2">
                 {data?.length > 0 &&
                     data?.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
+                            style={{
+                                height: `${
+                                    ((item as number) * 100) / 40 + 70
+                                }px`,
+                            }}
+                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4 ${
                                 idx === length
-                                    ? "!border-green-700 shadow-2xl"
+                                    ? "!border-green-700 shadow-xl"
                                     : idx <= length - 1 || isDone
                                     ? "!border-black"
                                     : "border-gray-300"
                             } ${
                                 idx === length - 1
-                                    ? "!border-blue-700 shadow-2xl"
+                                    ? "!border-blue-700 shadow-xl"
                                     : idx <= length - 1 || isDone
                                     ? "!border-black"
                                     : "border-gray-300"

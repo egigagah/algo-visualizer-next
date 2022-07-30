@@ -83,7 +83,7 @@ export default function BubbleSortIntervalComponent(): JSX.Element {
                     data?.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8 ${
+                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-4 ${
                                 idx === pointer && idx !== pointer - 1
                                     ? "border-green-700 shadow-2xl"
                                     : ""

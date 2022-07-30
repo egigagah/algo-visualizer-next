@@ -74,12 +74,17 @@ export default function InsertionSortComponent(): JSX.Element {
             <div className="flex justify-center">
                 <h2 className="text-2xl font-bold">Insertion Sort</h2>
             </div>
-            <div className="flex flex-row justify-center items-center space-x-2">
+            <div className="flex flex-row justify-center items-end space-x-2">
                 {data.length > 0 &&
                     data.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
+                            style={{
+                                height: `${
+                                    ((item as number) * 100) / 40 + 70
+                                }px`,
+                            }}
+                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4
                             ${
                                 idx === length[1]
                                     ? "!border-green-700"
@@ -92,7 +97,7 @@ export default function InsertionSortComponent(): JSX.Element {
                             }
                             ${
                                 pointer === idx
-                                    ? "font-black underline shadow-lg"
+                                    ? "font-black underline shadow-xl"
                                     : "no-underline"
                             }
                           `}

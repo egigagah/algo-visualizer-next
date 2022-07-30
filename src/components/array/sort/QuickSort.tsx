@@ -199,38 +199,43 @@ export default function QuickSortComponent(): JSX.Element {
             <div className="flex justify-center">
                 <h2 className="text-2xl font-bold">Quick Sort</h2>
             </div>
-            <div className="flex flex-row justify-center items-center space-x-2">
+            <div className="flex flex-row justify-center items-end space-x-2">
                 {data.length > 0 &&
                     data.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`flex w-20 h-20 justify-center items-center self-center text-4xl border-8
+                            style={{
+                                height: `${
+                                    ((item as number) * 100) / 40 + 70
+                                }px`,
+                            }}
+                            className={`flex w-20 pb-2 justify-center items-end text-4xl border-4
                             ${
                                 currPivot === idx &&
                                 idx !== leftPointer &&
                                 !isDone
-                                    ? "!border-red-500 underline font-black"
+                                    ? "!border-red-500 underline font-bold"
                                     : "no-underline font-normal"
                             }
                             ${
                                 idx === rightPointer &&
                                 idx !== leftPointer &&
                                 !isDone
-                                    ? "!border-green-700"
+                                    ? "!border-green-700 shadow-xl"
                                     : ""
                             }
                             ${
                                 idx === leftPointer &&
                                 idx !== rightPointer &&
                                 !isDone
-                                    ? "!border-blue-700"
+                                    ? "!border-blue-700 shadow-xl"
                                     : ""
                             }
                             ${
                                 idx === rightPointer &&
                                 idx === leftPointer &&
                                 !isDone
-                                    ? "!border-x-green-500 !border-y-blue-500"
+                                    ? "!border-x-green-500 !border-y-blue-500 shadow-xl"
                                     : "border-gray-300"
                             }
                             ${
