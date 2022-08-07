@@ -1,6 +1,7 @@
 import PlayerContext from "@components/player/PlayerContext";
 import React, { useContext, useEffect, useState } from "react";
 import { swap } from "src/utils/algo/array";
+import { DoubleLinkedList, LinkedList } from "src/utils/algo/linked-list";
 import useInterval from "src/utils/hooks/useInterval";
 
 export default function BubbleSortIntervalComponent(): JSX.Element {

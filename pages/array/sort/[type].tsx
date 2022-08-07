@@ -30,7 +30,7 @@ const ArrayTypeSort: React.FC = () => {
                 </div> */}
                 <ArrayWrapper type={type} />
             </div>
-            <div className="flex flex-col w-1/3 shadow-md px-4 py-2 space-y-4 text-sm">
+            {/* <div className="flex flex-col w-1/3 shadow-md px-4 py-2 space-y-4 text-sm">
                 <div className="flex flex-col">
                     <h3>Legend</h3>
                     <div className="flex flex-row content-center items-center">
@@ -59,7 +59,7 @@ const ArrayTypeSort: React.FC = () => {
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

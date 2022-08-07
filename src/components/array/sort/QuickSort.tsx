@@ -1,5 +1,6 @@
 import PlayerContext from "@components/player/PlayerContext";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { DoubleLinkedList } from "src/utils/algo/linked-list";
 import { promiseSwap, waiting } from "src/utils/helper";
 
 export default function QuickSortComponent(): JSX.Element {
@@ -14,8 +15,7 @@ export default function QuickSortComponent(): JSX.Element {
     const [currPivot, setPivot] = useState(0);
 
     // ref for helper data;
-    const currArray = useRef([0, data.length > 0 ? data.length - 1 : 0]);
-    const stackArray = useRef([[0, data.length > 0 ? data.length - 1 : 0]]);
+    const queues = useRef(new DoubleLinkedList<number[]>());
     const generatorStatus = useRef<Promise<IteratorResult<boolean, void>>>();
     const playingStatus = useRef<boolean>(state.isPlaying ?? false);
     const pausePosition = useRef<number[] | undefined>();
@@ -45,36 +45,32 @@ export default function QuickSortComponent(): JSX.Element {
 
     async function* sorting(arr: (string | number)[]) {
         do {
-            if (currArray.current[0] < currArray.current[1]) {
-                const [left, right] = stackArray.current[0];
-                lengthArray.current = right;
-                const rightIdx = await pivotHelper(arr, left, right);
+            if (queues.current.head && queues.current.head.value) {
+                const headValue = queues.current.head.value;
+                if (headValue[0] < headValue[1]) {
+                    const [left, right] = queues.current.head
+                        ?.value as Array<number>;
+                    lengthArray.current = right;
+                    const rightIdx = await pivotHelper(arr, left, right);
 
-                // left array
-                currArray.current[0] = left;
-                currArray.current[1] = rightIdx - 1;
-                const tmp = [];
-                if (currArray.current[0] < currArray.current[1]) {
-                    tmp.push([currArray.current[0], currArray.current[1]]);
+                    // left array
+                    headValue[0] = left;
+                    headValue[1] = rightIdx - 1;
+                    if (headValue[0] < headValue[1])
+                        queues.current.addTail([headValue[0], headValue[1]]);
+
+                    // right array
+                    headValue[0] = rightIdx + 1;
+                    headValue[1] = lengthArray.current;
+                    if (headValue[0] < headValue[1])
+                        queues.current.addTail([headValue[0], headValue[1]]);
                 }
-
-                // right array
-                currArray.current[0] = rightIdx + 1;
-                currArray.current[1] = lengthArray.current;
-                if (currArray.current[0] < currArray.current[1]) {
-                    tmp.push([currArray.current[0], currArray.current[1]]);
-                }
-
-                stackArray.current.push(...tmp);
             }
 
-            if (playingStatus.current) stackArray.current.shift();
-            if (stackArray.current.length > 0) {
-                const [left, right] = stackArray.current[0];
-                currArray.current = [left, right];
-                yield false;
-            } else yield true;
-        } while (stackArray.current.length > 0);
+            if (playingStatus.current) queues.current.deleteHead();
+            if (queues.current.size > 0) yield false;
+            else yield true;
+        } while (queues.current.size > 0 && queues.current.head);
         setDone(true);
         yield true;
     }
@@ -145,18 +141,10 @@ export default function QuickSortComponent(): JSX.Element {
             generatorStatus.current = undefined;
             setDone(false);
             pausePosition.current = undefined;
-            stackArray.current = [
-                [
-                    0,
-                    state.data && state.data.length > 0
-                        ? state.data.length - 1
-                        : 0,
-                ],
-            ];
-            currArray.current = [
+            queues.current = new DoubleLinkedList<number[]>([
                 0,
                 state.data && state.data.length > 0 ? state.data.length - 1 : 0,
-            ];
+            ]);
         }
     }, [state.isReset]);
 
@@ -169,18 +157,10 @@ export default function QuickSortComponent(): JSX.Element {
             setPivot(0);
             generatorStatus.current = undefined;
             setDone(false);
-            stackArray.current = [
-                [
-                    0,
-                    state.data && state.data.length > 0
-                        ? state.data.length - 1
-                        : 0,
-                ],
-            ];
-            currArray.current = [
+            queues.current = new DoubleLinkedList<number[]>([
                 0,
                 state.data && state.data.length > 0 ? state.data.length - 1 : 0,
-            ];
+            ]);
         }
     }, [state.data]);
 
